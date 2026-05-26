@@ -1,31 +1,22 @@
 import axiosInstance from "./axios";
 
-// =========================
-// Dashboard
-// =========================
-export const getAdminStats = async () => {
-  return await axiosInstance.get("/api/admin/stats");
-};
+// ===============================
+// USERS
+// ===============================
+export const getAdminUsers = () => axiosInstance.get("/api/admin/users");
 
-export const getAdminBookings = async () => {
-  return await axiosInstance.get("/api/admin/bookings");
-};
+export const createAdminUser = (data) =>
+  axiosInstance.post("/api/admin/users", data);
 
-// =========================
-// User Management
-// =========================
-export const getAdminUsers = async () => {
-  return await axiosInstance.get("/api/admin/users");
-};
+export const updateAdminUser = (id, data) =>
+  axiosInstance.put(`/api/admin/users/${id}`, data);
 
-export const createAdminUser = async (data) => {
-  return await axiosInstance.post("/api/admin/users", data);
-};
+export const deleteAdminUser = (id) =>
+  axiosInstance.delete(`/api/admin/users/${id}`);
 
-export const updateAdminUser = async (userId, data) => {
-  return await axiosInstance.put(`/api/admin/users/${userId}`, data);
-};
+// ===============================
+// DASHBOARD
+// ===============================
+export const getAdminStats = () => axiosInstance.get("/api/admin/stats");
 
-export const deleteAdminUser = async (userId) => {
-  return await axiosInstance.delete(`/api/admin/users/${userId}`);
-};
+export const getAdminBookings = () => axiosInstance.get("/api/admin/bookings");

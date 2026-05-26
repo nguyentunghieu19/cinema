@@ -22,9 +22,8 @@ function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md text-white shadow-lg border-b border-gray-800">
+    <nav className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md text-white shadow-lg border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo */}
         <Link
           to="/"
           className="text-2xl font-bold text-red-500 hover:text-red-400"
@@ -32,7 +31,6 @@ function Navbar() {
           🎬 Cinema Booking
         </Link>
 
-        {/* Menu */}
         <div className="flex items-center gap-4">
           <Link to="/" className="hover:text-red-400">
             Trang chủ
@@ -50,7 +48,6 @@ function Navbar() {
             </>
           )}
 
-          {/* Admin / Staff */}
           {user && ["admin", "staff"].includes(user.role) && (
             <button
               onClick={goToAdmin}
@@ -60,7 +57,6 @@ function Navbar() {
             </button>
           )}
 
-          {/* Auth buttons */}
           {!user ? (
             <>
               <Link

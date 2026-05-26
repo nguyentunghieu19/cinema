@@ -20,6 +20,8 @@ from app.models import user as user_model
 from app.models import movie as movie_model
 from app.models import showtime as showtime_model
 from app.models import booking as booking_model
+from app.models import payment as payment_model
+from app.routes import payments
 
 app = FastAPI()
 
@@ -67,7 +69,7 @@ app.include_router(showtime.router)
 app.include_router(booking.router)
 app.include_router(admin.router)
 app.include_router(upload.router)
-
+app.include_router(payments.router)
 # =========================
 # Test API
 # =========================

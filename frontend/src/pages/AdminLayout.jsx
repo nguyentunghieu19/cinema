@@ -16,6 +16,10 @@ function AdminLayout() {
             Quản lý phim
           </Link>
 
+          <Link to="/admin/showtimes" className="block hover:text-red-500">
+            Quản lý lịch chiếu
+          </Link>
+
           <Link to="/admin/users" className="block hover:text-red-500">
             Quản lý người dùng
           </Link>

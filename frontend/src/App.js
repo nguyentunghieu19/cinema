@@ -8,7 +8,8 @@ import MyTicketsPage from "./pages/MyTicketsPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-
+import AdminShowtimes from "./pages/AdminShowtimes";
+import PaymentResultPage from "./pages/PaymentResultPage";
 // Admin pages
 import AdminLayout from "./pages/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -36,7 +37,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
+        <Route path="/payment-result" element={<PaymentResultPage />} />
         {/* Admin routes */}
         <Route
           path="/admin"
@@ -51,6 +52,7 @@ function App() {
           <Route path="users" element={<AdminUsers />} />
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="reports" element={<AdminReports />} />
+          <Route path="showtimes" element={<AdminShowtimes />} />
         </Route>
       </Routes>
     </Router>

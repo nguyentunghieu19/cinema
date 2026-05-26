@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-
+from app.models.payment import Payment
 from app.db.database import get_db
 from app.models.user import User
 from app.models.movie import Movie
@@ -27,30 +27,91 @@ router = APIRouter(prefix="/api/admin", tags=["Admin"])
 # =========================================================
 @router.get("/stats")
 def get_admin_stats(
-    admin=Depends(require_admin),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
-    total_movies = db.query(Movie).count()
-    total_showtimes = db.query(Showtime).count()
-    total_users = db.query(User).count()
-    total_bookings = db.query(Booking).count()
 
-    # Tính tổng doanh thu
-    total_revenue = (
-        db.query(func.sum(Showtime.price))
-        .join(Booking, Booking.showtime_id == Showtime.id)
-        .scalar()
-        or 0
+    # =========================
+    # Tổng số phim
+    # =========================
+    total_movies = db.query(Movie).count()
+
+    # =========================
+    # Tổng lịch chiếu
+    # =========================
+    total_showtimes = db.query(Showtime).count()
+
+    # =========================
+    # Tổng người dùng
+    # =========================
+    total_users = db.query(User).count()
+
+    # =========================
+    # Tổng vé bán
+    # =========================
+    total_bookings = (
+        db.query(Booking)
+        .join(
+            Payment,
+            Payment.booking_id == Booking.id
+        )
+        .filter(
+            Payment.status == "success"
+        )
+        .count()
     )
 
-    # Thống kê số phim có booking
+    # =========================
+    # Tổng doanh thu
+    # =========================
+    total_revenue = (
+        db.query(
+            func.sum(Payment.amount)
+        )
+        .filter(
+            Payment.status == "success"
+        )
+        .scalar()
+    )
+
+    if total_revenue is None:
+        total_revenue = 0
+
+    # =========================
+    # Thống kê phim
+    # =========================
     movie_stats = (
-        db.query(Movie.id)
-        .join(Showtime, Showtime.movie_id == Movie.id)
-        .join(Booking, Booking.showtime_id == Showtime.id)
-        .distinct()
+        db.query(
+            Movie.title,
+            func.count(Booking.id).label("total_tickets"),
+            func.sum(Payment.amount).label("revenue")
+        )
+        .join(
+            Showtime,
+            Showtime.movie_id == Movie.id
+        )
+        .join(
+            Booking,
+            Booking.showtime_id == Showtime.id
+        )
+        .join(
+            Payment,
+            Payment.booking_id == Booking.id
+        )
+        .filter(
+            Payment.status == "success"
+        )
+        .group_by(Movie.title)
         .all()
     )
+
+    result = []
+
+    for movie in movie_stats:
+        result.append({
+            "movie_title": movie.title,
+            "total_tickets": movie.total_tickets,
+            "revenue": movie.revenue or 0
+        })
 
     return {
         "total_movies": total_movies,
@@ -58,9 +119,8 @@ def get_admin_stats(
         "total_users": total_users,
         "total_bookings": total_bookings,
         "total_revenue": total_revenue,
-        "movie_stats": movie_stats,
+        "movie_stats": result
     }
-
 
 # =========================================================
 # All Bookings
