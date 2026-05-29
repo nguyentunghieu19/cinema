@@ -23,9 +23,6 @@ function AdminMovies() {
     fetchMovies();
   }, []);
 
-  // =========================
-  // Lấy danh sách phim
-  // =========================
   const fetchMovies = async () => {
     try {
       const res = await axiosInstance.get("/api/movies/");
@@ -35,9 +32,6 @@ function AdminMovies() {
     }
   };
 
-  // =========================
-  // Upload poster
-  // =========================
   const handleUploadPoster = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -66,9 +60,6 @@ function AdminMovies() {
     }
   };
 
-  // =========================
-  // Thay đổi form
-  // =========================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -78,9 +69,6 @@ function AdminMovies() {
     }));
   };
 
-  // =========================
-  // Submit thêm/sửa
-  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -101,9 +89,6 @@ function AdminMovies() {
     }
   };
 
-  // =========================
-  // Sửa phim
-  // =========================
   const handleEdit = (movie) => {
     setEditingId(movie.id);
     setForm({
@@ -122,9 +107,6 @@ function AdminMovies() {
     });
   };
 
-  // =========================
-  // Xóa phim
-  // =========================
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa phim này?")) {
       return;
@@ -140,9 +122,6 @@ function AdminMovies() {
     }
   };
 
-  // =========================
-  // Reset form
-  // =========================
   const resetForm = () => {
     setEditingId(null);
     setForm({
@@ -157,100 +136,150 @@ function AdminMovies() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-10">
+    <div className="min-h-screen bg-neutral-950 text-white px-4 sm:px-6 py-8">
       <div className="max-w-7xl mx-auto">
-        {/* Form */}
-        <div className="bg-gray-900 p-6 rounded-2xl mb-10">
-          <h1 className="text-3xl font-bold mb-6">
-            {editingId ? "✏️ Chỉnh sửa phim" : "➕ Thêm phim mới"}
+        {/* Form Section */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 mb-10">
+          <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            {editingId ? (
+              <>
+                <span>✏️</span>
+                <span>Chỉnh sửa phim</span>
+              </>
+            ) : (
+              <>
+                <span>➕</span>
+                <span>Thêm phim mới</span>
+              </>
+            )}
           </h1>
 
-          <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
-            <input
-              name="title"
-              placeholder="Tên phim"
-              value={form.title}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded"
-              required
-            />
+          <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-5">
+            {/* Row 1 */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Tên phim *
+              </label>
+              <input
+                name="title"
+                placeholder="Nhập tên phim"
+                value={form.title}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                required
+              />
+            </div>
 
-            <input
-              name="genre"
-              placeholder="Thể loại"
-              value={form.genre}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded"
-            />
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Thể loại
+              </label>
+              <input
+                name="genre"
+                placeholder="Hành động, Hài,..."
+                value={form.genre}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+              />
+            </div>
 
-            <input
-              type="number"
-              name="duration"
-              placeholder="Thời lượng (phút)"
-              value={form.duration}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded"
-            />
+            {/* Row 2 */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Thời lượng (phút)
+              </label>
+              <input
+                type="number"
+                name="duration"
+                value={form.duration}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+              />
+            </div>
 
-            <input
-              type="number"
-              step="0.1"
-              name="rating"
-              placeholder="Đánh giá"
-              value={form.rating}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded"
-            />
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Đánh giá (0-10)
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                name="rating"
+                value={form.rating}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+              />
+            </div>
 
-            <input
-              name="trailer_url"
-              placeholder="Trailer URL"
-              value={form.trailer_url}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded md:col-span-2"
-            />
+            {/* Full width */}
+            <div className="md:col-span-2">
+              <label className="block text-sm text-gray-400 mb-2">
+                Trailer URL
+              </label>
+              <input
+                name="trailer_url"
+                placeholder="https://youtube.com/..."
+                value={form.trailer_url}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+              />
+            </div>
 
-            <textarea
-              name="description"
-              placeholder="Mô tả phim"
-              value={form.description}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded md:col-span-2"
-              rows="4"
-            />
+            <div className="md:col-span-2">
+              <label className="block text-sm text-gray-400 mb-2">
+                Mô tả phim
+              </label>
+              <textarea
+                name="description"
+                placeholder="Nội dung phim..."
+                value={form.description}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                rows="4"
+              />
+            </div>
 
             {/* Upload Poster */}
             <div className="md:col-span-2">
-              <label className="block mb-2 font-semibold">Upload Poster</label>
+              <label className="block text-sm text-gray-400 mb-2">Poster</label>
+              <div className="flex items-center gap-4">
+                <label className="cursor-pointer bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 px-4 py-3 rounded-xl transition-colors">
+                  <span className="text-sm">📁 Chọn ảnh</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUploadPoster}
+                    className="hidden"
+                  />
+                </label>
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleUploadPoster}
-                className="w-full bg-gray-800 p-3 rounded"
-              />
-
-              {uploading && (
-                <p className="text-yellow-400 mt-2">Đang upload ảnh...</p>
-              )}
+                {uploading && (
+                  <span className="text-yellow-400 text-sm">
+                    Đang upload...
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Poster URL */}
-            <input
-              name="poster_url"
-              placeholder="Poster URL"
-              value={form.poster_url}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded md:col-span-2"
-            />
+            {/* Poster URL Input */}
+            <div className="md:col-span-2">
+              <input
+                name="poster_url"
+                placeholder="Hoặc nhập poster URL trực tiếp"
+                value={form.poster_url}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+              />
+            </div>
 
             {/* Preview */}
             {form.poster_url && (
               <div className="md:col-span-2">
+                <p className="text-sm text-gray-400 mb-2">Preview:</p>
                 <img
                   src={form.poster_url}
                   alt="Poster Preview"
-                  className="w-48 rounded-lg shadow-lg mt-2"
+                  className="w-32 h-48 object-cover rounded-lg border border-neutral-700"
                 />
               </div>
             )}
@@ -259,16 +288,16 @@ function AdminMovies() {
             <div className="md:col-span-2 flex gap-4">
               <button
                 type="submit"
-                className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded font-semibold"
+                className="bg-red-600 hover:bg-red-700 px-8 py-3 rounded-xl font-semibold transition-colors"
               >
-                {editingId ? "Cập nhật phim" : "Thêm phim"}
+                {editingId ? "💾 Cập nhật" : "➕ Thêm phim"}
               </button>
 
               {editingId && (
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded"
+                  className="bg-neutral-700 hover:bg-neutral-600 px-6 py-3 rounded-xl transition-colors"
                 >
                   Hủy
                 </button>
@@ -277,47 +306,59 @@ function AdminMovies() {
           </form>
         </div>
 
-        {/* Danh sách phim */}
-        <h2 className="text-3xl font-bold mb-6">🎬 Danh sách phim</h2>
+        {/* Movie List */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">🎬 Danh sách phim</h2>
+          <span className="text-gray-400 text-sm">{movies.length} phim</span>
+        </div>
 
         {movies.length === 0 ? (
-          <p className="text-gray-400">Chưa có phim nào.</p>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 text-center">
+            <p className="text-gray-400">Chưa có phim nào.</p>
+          </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {movies.map((movie) => (
               <div
                 key={movie.id}
-                className="bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
+                className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden hover:border-red-500/50 transition-all group"
               >
-                <img
-                  src={
-                    movie.poster_url ||
-                    "https://via.placeholder.com/400x600?text=No+Poster"
-                  }
-                  alt={movie.title}
-                  className="w-full h-96 object-cover"
-                />
+                <div className="relative">
+                  <img
+                    src={
+                      movie.poster_url ||
+                      "https://via.placeholder.com/400x600?text=No+Poster"
+                    }
+                    alt={movie.title}
+                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+                    ID: {movie.id}
+                  </div>
+                </div>
 
                 <div className="p-4">
-                  <h3 className="text-xl font-bold mb-2">{movie.title}</h3>
-
-                  <p className="text-gray-400 mb-2">{movie.genre}</p>
-
-                  <p className="text-yellow-400 mb-4">
-                    ⭐ {movie.rating || "N/A"}
+                  <h3 className="text-lg font-bold mb-1 truncate">
+                    {movie.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm mb-1">
+                    {movie.genre || "Chưa cập nhật"}
+                  </p>
+                  <p className="text-yellow-400 text-sm font-medium mb-4">
+                    ⭐ {movie.rating || "N/A"}/10
                   </p>
 
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(movie)}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 py-2 rounded"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-medium transition-colors"
                     >
                       Sửa
                     </button>
 
                     <button
                       onClick={() => handleDelete(movie.id)}
-                      className="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded"
+                      className="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-medium transition-colors"
                     >
                       Xóa
                     </button>

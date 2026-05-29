@@ -94,129 +94,200 @@ function AdminUsers() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-10">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Quản lý người dùng</h1>
+  // Helper for role badge color
+  const getRoleBadge = (role) => {
+    const colors = {
+      admin: "bg-red-600 text-white",
+      staff: "bg-blue-600 text-white",
+      user: "bg-gray-600 text-white",
+    };
+    return colors[role] || colors.user;
+  };
 
-        {/* Form */}
+  return (
+    <div className="min-h-screen bg-neutral-950 text-white px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold mb-8">👥 Quản lý người dùng</h1>
+
+        {/* Form Section */}
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-900 p-6 rounded-2xl mb-10 space-y-4"
+          className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 mb-10"
         >
-          <h2 className="text-2xl font-bold">
-            {editingUserId ? "Cập nhật người dùng" : "Thêm tài khoản mới"}
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            {editingUserId ? (
+              <>
+                <span>✏️</span>
+                <span>Cập nhật người dùng</span>
+              </>
+            ) : (
+              <>
+                <span>➕</span>
+                <span>Thêm tài khoản mới</span>
+              </>
+            )}
           </h2>
 
-          <input
-            type="text"
-            placeholder="Họ tên"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full p-3 rounded bg-gray-800"
-            required
-          />
+          <div className="grid md:grid-cols-2 gap-5">
+            {/* Name */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Họ tên *
+              </label>
+              <input
+                type="text"
+                placeholder="Nhập họ tên"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                required
+              />
+            </div>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full p-3 rounded bg-gray-800"
-            required
-          />
+            {/* Email */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Email *
+              </label>
+              <input
+                type="email"
+                placeholder="admin@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                required
+              />
+            </div>
 
-          {!editingUserId && (
-            <input
-              type="password"
-              placeholder="Mật khẩu"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full p-3 rounded bg-gray-800"
-              required
-            />
-          )}
-
-          <select
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-            className="w-full p-3 rounded bg-gray-800"
-          >
-            <option value="user">user</option>
-            <option value="staff">staff</option>
-            <option value="admin">admin</option>
-          </select>
-
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded"
-            >
-              {editingUserId ? "Cập nhật" : "Tạo tài khoản"}
-            </button>
-
-            {editingUserId && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded"
-              >
-                Hủy
-              </button>
+            {/* Password - only show when creating */}
+            {!editingUserId && (
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Mật khẩu *
+                </label>
+                <input
+                  type="password"
+                  placeholder="Nhập mật khẩu"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                  required
+                />
+              </div>
             )}
+
+            {/* Empty div for spacing when password is hidden */}
+            {!editingUserId && <div></div>}
+
+            {/* Role */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Vai trò
+              </label>
+              <select
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+              >
+                <option value="user">User</option>
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+            {/* Buttons */}
+            <div className="md:col-span-2 flex gap-4 mt-2">
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 px-8 py-3 rounded-xl font-semibold transition-colors"
+              >
+                {editingUserId ? "💾 Cập nhật" : "➕ Tạo tài khoản"}
+              </button>
+
+              {editingUserId && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="bg-neutral-700 hover:bg-neutral-600 px-6 py-3 rounded-xl transition-colors"
+                >
+                  Hủy
+                </button>
+              )}
+            </div>
           </div>
         </form>
 
-        {/* Table */}
-        <div className="bg-gray-900 rounded-2xl overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-800 text-left">
-              <tr>
-                <th className="p-4">ID</th>
-                <th className="p-4">Tên</th>
-                <th className="p-4">Email</th>
-                <th className="p-4">Role</th>
-                <th className="p-4">Trạng thái</th>
-                <th className="p-4">Thao tác</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-t border-gray-800">
-                  <td className="p-4">{user.id}</td>
-                  <td className="p-4">{user.name}</td>
-                  <td className="p-4">{user.email}</td>
-                  <td className="p-4">
-                    <span className="bg-blue-600 px-2 py-1 rounded text-sm">
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    {user.is_active ? "Hoạt động" : "Bị khóa"}
-                  </td>
-                  <td className="p-4 flex gap-2">
-                    <button
-                      onClick={() => handleEdit(user)}
-                      className="bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded"
-                    >
-                      Sửa
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(user)}
-                      className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
-                    >
-                      Xóa
-                    </button>
-                  </td>
+        {/* User Table */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-neutral-800 text-gray-400 text-sm uppercase">
+                <tr>
+                  <th className="px-6 py-4 text-left font-medium">ID</th>
+                  <th className="px-6 py-4 text-left font-medium">Tên</th>
+                  <th className="px-6 py-4 text-left font-medium">Email</th>
+                  <th className="px-6 py-4 text-left font-medium">Vai trò</th>
+                  <th className="px-6 py-4 text-left font-medium">
+                    Trạng thái
+                  </th>
+                  <th className="px-6 py-4 text-left font-medium">Thao tác</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody className="divide-y divide-neutral-800">
+                {users.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="hover:bg-neutral-800/50 transition-colors"
+                  >
+                    <td className="px-6 py-4 text-gray-400">#{user.id}</td>
+                    <td className="px-6 py-4 font-medium">{user.name}</td>
+                    <td className="px-6 py-4 text-gray-300">{user.email}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getRoleBadge(
+                          user.role,
+                        )}`}
+                      >
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`text-sm ${
+                          user.is_active ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {user.is_active ? "● Hoạt động" : "● Bị khóa"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(user)}
+                          className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Sửa
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(user)}
+                          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Xóa
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {users.length === 0 && (
-            <div className="p-6 text-center text-gray-400">
+            <div className="p-8 text-center text-gray-400">
               Không có người dùng nào.
             </div>
           )}

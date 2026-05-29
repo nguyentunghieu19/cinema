@@ -1,25 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { QRCodeCanvas } from "qrcode.react";
-import { deleteBooking } from "../api/bookingApi";
+import { motion } from "framer-motion";
+
 const API_URL = "http://127.0.0.1:8000/api";
 
 function MyTicketsPage() {
-  const handleCancelTicket = async (bookingId) => {
-    const confirmCancel = window.confirm("Bạn có chắc chắn muốn hủy vé này?");
-
-    if (!confirmCancel) return;
-
-    try {
-      await deleteBooking(bookingId);
-      alert("Hủy vé thành công");
-      fetchMyTickets();
-    } catch (error) {
-      console.error(error);
-      alert("Hủy vé thất bại");
-    }
-  };
   const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchMyTickets();
@@ -28,7 +16,10 @@ function MyTicketsPage() {
   const fetchMyTickets = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const bookingRes = await axios.get(`${API_URL}/bookings/`);
@@ -62,19 +53,36 @@ function MyTicketsPage() {
       setTickets(enrichedTickets);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-10">
+    <div className="min-h-screen bg-neutral-950 text-white px-4 sm:px-6 py-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Vé của tôi</h1>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-bold">🎟️ Vé của tôi</h1>
+          <span className="text-gray-400 text-sm">{tickets.length} vé</span>
+        </div>
 
         {tickets.length === 0 ? (
-          <p className="text-gray-400">Bạn chưa đặt vé nào.</p>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-12 text-center">
+            <div className="text-6xl mb-4">🎟️</div>
+            <p className="text-gray-400 text-lg">Bạn chưa đặt vé nào.</p>
+          </div>
         ) : (
-          <div className="grid gap-6">
-            {tickets.map((ticket) => {
+          <div className="space-y-6">
+            {tickets.map((ticket, index) => {
               const qrValue = JSON.stringify({
                 booking_id: ticket.id,
                 movie: ticket.movie.title,
@@ -84,60 +92,94 @@ function MyTicketsPage() {
               });
 
               return (
-                <div
+                <motion.div
                   key={ticket.id}
-                  className="bg-gray-900 rounded-2xl overflow-hidden shadow-lg border border-gray-800 flex flex-col md:flex-row"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden flex flex-col lg:flex-row hover:border-red-500/50 transition-all"
                 >
-                  <img
-                    src={
-                      ticket.movie.poster_url ||
-                      "https://via.placeholder.com/300x400?text=No+Poster"
-                    }
-                    alt={ticket.movie.title}
-                    className="w-full md:w-56 h-80 object-cover"
-                  />
+                  {/* Poster */}
+                  <div className="lg:w-64 h-64 lg:h-auto relative">
+                    <img
+                      src={
+                        ticket.movie.poster_url ||
+                        "https://via.placeholder.com/300x400?text=No+Poster"
+                      }
+                      alt={ticket.movie.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                      #{ticket.id}
+                    </div>
+                  </div>
 
+                  {/* Info */}
                   <div className="flex-1 p-6">
-                    <h2 className="text-3xl font-bold mb-4 text-red-500">
+                    <h2 className="text-2xl font-bold mb-2 text-red-500 truncate">
                       {ticket.movie.title}
                     </h2>
 
-                    <div className="space-y-2 text-gray-300">
-                      <p>🎫 Mã vé: #{ticket.id}</p>
-                      <p>
-                        🕒 Suất chiếu:{" "}
-                        {new Date(ticket.showtime.start_time).toLocaleString(
-                          "vi-VN",
-                        )}
-                      </p>
-                      <p>🏢 Phòng: {ticket.showtime.theater_room}</p>
-                      <p>💺 Ghế: {ticket.seat_number}</p>
-                      <p>
-                        💰 Giá vé: {ticket.showtime.price.toLocaleString()} VNĐ
-                      </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
+                        <span className="text-xl">🕒</span>
+                        <div>
+                          <p className="text-gray-400 text-xs">Suất chiếu</p>
+                          <p className="font-medium">
+                            {new Date(
+                              ticket.showtime.start_time,
+                            ).toLocaleString("vi-VN")}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
+                        <span className="text-xl">🏢</span>
+                        <div>
+                          <p className="text-gray-400 text-xs">Phòng</p>
+                          <p className="font-medium">
+                            {ticket.showtime.theater_room}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
+                        <span className="text-xl">💺</span>
+                        <div>
+                          <p className="text-gray-400 text-xs">Ghế</p>
+                          <p className="font-bold text-green-400 text-lg">
+                            {ticket.seat_number}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
+                        <span className="text-xl">💰</span>
+                        <div>
+                          <p className="text-gray-400 text-xs">Giá vé</p>
+                          <p className="font-medium text-yellow-400">
+                            {ticket.showtime.price.toLocaleString()} VNĐ
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="mt-6 border-t border-dashed border-gray-700 pt-4">
+                    {/* Note */}
+                    <div className="mt-6 pt-4 border-t border-neutral-800">
                       <p className="text-sm text-gray-500">
-                        Vui lòng đến trước giờ chiếu 15 phút.
+                        📌 Vui lòng đến trước giờ chiếu 15 phút để check-in.
                       </p>
-                      <button
-                        onClick={() => handleCancelTicket(ticket.id)}
-                        className="mt-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
-                      >
-                        Hủy vé
-                      </button>
                     </div>
                   </div>
 
                   {/* QR Code */}
-                  <div className="bg-white p-6 flex flex-col items-center justify-center">
-                    <QRCodeCanvas value={qrValue} size={160} />
-                    <p className="text-black text-sm mt-3 font-medium">
-                      Quét mã để check-in
+                  <div className="bg-white p-6 flex flex-col items-center justify-center lg:w-48">
+                    <QRCodeCanvas value={qrValue} size={140} />
+                    <p className="text-black text-xs mt-3 font-bold">
+                      QUÉT MÃ CHECK-IN
                     </p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
