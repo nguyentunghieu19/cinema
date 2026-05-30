@@ -13,6 +13,15 @@ function MyTicketsPage() {
     fetchMyTickets();
   }, []);
 
+  // Hàm bổ trợ ép chuỗi thời gian trần về đúng chuẩn UTC để định dạng không bị lệch 7 tiếng
+  const formatToUTCDate = (dateStr) => {
+    if (!dateStr) return 0;
+    // Nếu chuỗi chưa có ký tự múi giờ Z hoặc dấu +, tự động format thành ISO và thêm Z ở cuối
+    return dateStr.endsWith("Z") || dateStr.includes("+")
+      ? dateStr
+      : `${dateStr.replace(" ", "T")}Z`;
+  };
+
   const fetchMyTickets = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -33,13 +42,11 @@ function MyTicketsPage() {
           const showtimeRes = await axios.get(
             `${API_URL}/showtimes/${booking.showtime_id}`,
           );
-
           const showtime = showtimeRes.data;
 
           const movieRes = await axios.get(
             `${API_URL}/movies/${showtime.movie_id}`,
           );
-
           const movie = movieRes.data;
 
           return {
@@ -50,9 +57,16 @@ function MyTicketsPage() {
         }),
       );
 
+      // Sắp xếp: Vé mới đặt nhất (timestamp lớn nhất) lên đầu danh sách
+      enrichedTickets.sort((a, b) => {
+        const timeA = new Date(formatToUTCDate(a.created_at)).getTime();
+        const timeB = new Date(formatToUTCDate(b.created_at)).getTime();
+        return timeB - timeA;
+      });
+
       setTickets(enrichedTickets);
     } catch (err) {
-      console.error(err);
+      console.error("Lỗi khi lấy danh sách vé:", err);
     } finally {
       setLoading(false);
     }
@@ -69,10 +83,11 @@ function MyTicketsPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white px-4 sm:px-6 py-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold">🎟️ Vé của tôi</h1>
-          <span className="text-gray-400 text-sm">{tickets.length} vé</span>
+          <h1 className="text-3xl font-bold text-red-500">🎟️ Vé của tôi</h1>
+          <span className="bg-neutral-900 px-4 py-2 rounded-xl border border-neutral-800 text-gray-300">
+            {tickets.length} vé
+          </span>
         </div>
 
         {tickets.length === 0 ? (
@@ -83,6 +98,12 @@ function MyTicketsPage() {
         ) : (
           <div className="space-y-6">
             {tickets.map((ticket, index) => {
+              // Xử lý múi giờ đồng bộ cho cả Suất chiếu lẫn Thời gian đặt
+              const startTime = new Date(
+                formatToUTCDate(ticket.showtime.start_time),
+              );
+              const isExpired = startTime < new Date();
+
               const qrValue = JSON.stringify({
                 booking_id: ticket.id,
                 movie: ticket.movie.title,
@@ -96,7 +117,7 @@ function MyTicketsPage() {
                   key={ticket.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.05 }}
                   className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden flex flex-col lg:flex-row hover:border-red-500/50 transition-all"
                 >
                   {/* Poster */}
@@ -104,81 +125,92 @@ function MyTicketsPage() {
                     <img
                       src={
                         ticket.movie.poster_url ||
-                        "https://via.placeholder.com/300x400?text=No+Poster"
+                        "https://via.placeholder.com/300x400"
                       }
                       alt={ticket.movie.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    <div className="absolute top-3 left-3 bg-red-600 px-3 py-1 rounded-full text-xs font-bold">
                       #{ticket.id}
+                    </div>
+                    <div
+                      className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold ${
+                        isExpired
+                          ? "bg-gray-700 text-white"
+                          : "bg-green-600 text-white"
+                      }`}
+                    >
+                      {isExpired ? "Đã chiếu" : "Sắp chiếu"}
                     </div>
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 p-6">
-                    <h2 className="text-2xl font-bold mb-2 text-red-500 truncate">
+                    <h2 className="text-2xl font-bold mb-4 text-red-500">
                       {ticket.movie.title}
                     </h2>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
-                        <span className="text-xl">🕒</span>
-                        <div>
-                          <p className="text-gray-400 text-xs">Suất chiếu</p>
-                          <p className="font-medium">
-                            {new Date(
-                              ticket.showtime.start_time,
-                            ).toLocaleString("vi-VN")}
-                          </p>
-                        </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="bg-neutral-800/50 rounded-xl p-3">
+                        <p className="text-xs text-gray-400">🕒 Suất chiếu</p>
+                        <p>
+                          {startTime.toLocaleString("vi-VN", {
+                            timeZone: "Asia/Ho_Chi_Minh",
+                          })}
+                        </p>
                       </div>
 
-                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
-                        <span className="text-xl">🏢</span>
-                        <div>
-                          <p className="text-gray-400 text-xs">Phòng</p>
-                          <p className="font-medium">
-                            {ticket.showtime.theater_room}
-                          </p>
-                        </div>
+                      <div className="bg-neutral-800/50 rounded-xl p-3">
+                        <p className="text-xs text-gray-400">🏢 Phòng chiếu</p>
+                        <p>{ticket.showtime.theater_room}</p>
                       </div>
 
-                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
-                        <span className="text-xl">💺</span>
-                        <div>
-                          <p className="text-gray-400 text-xs">Ghế</p>
-                          <p className="font-bold text-green-400 text-lg">
-                            {ticket.seat_number}
-                          </p>
-                        </div>
+                      <div className="bg-neutral-800/50 rounded-xl p-3">
+                        <p className="text-xs text-gray-400">💺 Ghế</p>
+                        <p className="font-bold text-green-400 text-lg">
+                          {ticket.seat_number}
+                        </p>
                       </div>
 
-                      <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-xl">
-                        <span className="text-xl">💰</span>
-                        <div>
-                          <p className="text-gray-400 text-xs">Giá vé</p>
-                          <p className="font-medium text-yellow-400">
-                            {ticket.showtime.price.toLocaleString()} VNĐ
-                          </p>
-                        </div>
+                      <div className="bg-neutral-800/50 rounded-xl p-3">
+                        <p className="text-xs text-gray-400">💰 Giá vé</p>
+                        <p className="text-yellow-400 font-semibold">
+                          {ticket.showtime.price.toLocaleString()} VNĐ
+                        </p>
+                      </div>
+
+                      <div className="bg-neutral-800/50 rounded-xl p-3 sm:col-span-2">
+                        <p className="text-xs text-gray-400">
+                          📅 Thời gian đặt
+                        </p>
+                        <p>
+                          {ticket.created_at
+                            ? new Date(
+                                formatToUTCDate(ticket.created_at),
+                              ).toLocaleString("vi-VN", {
+                                timeZone: "Asia/Ho_Chi_Minh",
+                              })
+                            : "Dữ liệu cũ"}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Note */}
-                    <div className="mt-6 pt-4 border-t border-neutral-800">
+                    <div className="mt-6 border-t border-neutral-800 pt-4">
                       <p className="text-sm text-gray-500">
                         📌 Vui lòng đến trước giờ chiếu 15 phút để check-in.
                       </p>
                     </div>
                   </div>
 
-                  {/* QR Code */}
-                  <div className="bg-white p-6 flex flex-col items-center justify-center lg:w-48">
-                    <QRCodeCanvas value={qrValue} size={140} />
-                    <p className="text-black text-xs mt-3 font-bold">
-                      QUÉT MÃ CHECK-IN
-                    </p>
-                  </div>
+                  {/* QR */}
+                  {!isExpired && (
+                    <div className="bg-white p-6 flex flex-col items-center justify-center lg:w-52">
+                      <QRCodeCanvas value={qrValue} size={140} />
+                      <p className="text-black font-bold text-xs mt-3 text-center">
+                        QUÉT MÃ CHECK-IN
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
               );
             })}

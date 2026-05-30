@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getAdminUsers,
   createAdminUser,
@@ -8,7 +9,7 @@ import {
 
 function AdminUsers() {
   const [users, setUsers] = useState([]);
-
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -19,6 +20,12 @@ function AdminUsers() {
   const [editingUserId, setEditingUserId] = useState(null);
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user || user.role !== "admin") {
+      navigate("/admin");
+      return;
+    }
     fetchUsers();
   }, []);
 

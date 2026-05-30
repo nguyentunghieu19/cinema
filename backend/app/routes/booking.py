@@ -26,10 +26,19 @@ def create_booking(
     db: Session = Depends(get_db)
 ):
 
-    existing_booking = db.query(Booking).filter(
+    existing_booking = (
+    db.query(Booking)
+    .join(
+        Payment,
+        Payment.booking_id == Booking.id
+    )
+    .filter(
         Booking.showtime_id == booking.showtime_id,
-        Booking.seat_number == booking.seat_number
-    ).first()
+        Booking.seat_number == booking.seat_number,
+        Payment.status == "success"
+    )
+    .first()
+)
 
     if existing_booking:
         raise HTTPException(

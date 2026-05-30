@@ -76,7 +76,7 @@ function PaymentResultPage() {
                 Về trang chủ
               </button>
               <button
-                onClick={() => navigate("/bookings")}
+                onClick={() => navigate("/my-tickets")}
                 className="px-8 py-3 bg-red-600 hover:bg-red-500 rounded-xl transition-colors"
               >
                 Xem vé đã đặt
