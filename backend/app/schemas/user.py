@@ -28,3 +28,14 @@ class UserResponse(UserBase):
 
 class UserOut(UserResponse):
     pass
+class VerifyEmailRequest(BaseModel):
+    email: EmailStr
+    code: str
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str
+    new_password: str

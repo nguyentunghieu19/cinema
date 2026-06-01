@@ -24,8 +24,13 @@ function RegisterPage() {
       setLoading(true);
       await registerUser(form);
 
-      alert("Đăng ký thành công! Vui lòng đăng nhập.");
-      navigate("/login");
+      alert("Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác thực.");
+
+      navigate("/verify-email", {
+        state: {
+          email: form.email,
+        },
+      });
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.detail || "Đăng ký thất bại");
