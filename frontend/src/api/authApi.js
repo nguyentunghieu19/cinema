@@ -1,14 +1,15 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/api";
+const API_URL = process.env.REACT_APP_API_URL;
 
-export const loginUser = (data) => axios.post(`${API_URL}/users/login`, data);
+export const loginUser = (data) =>
+  axios.post(`${API_URL}/api/users/login`, data);
 
 export const registerUser = (data) =>
-  axios.post(`${API_URL}/users/register`, data);
+  axios.post(`${API_URL}/api/users/register`, data);
 
 export const forgotPassword = (data) =>
-  axios.post(`${API_URL}/users/forgot-password`, data);
+  axios.post(`${API_URL}/api/users/forgot-password`, data);
 
 export const resetPassword = (data) =>
-  axios.post(`${API_URL}/users/reset-password`, data);
+  axios.post(`${API_URL}/api/users/reset-password`, data);
