@@ -9,8 +9,10 @@ function MyTicketsPage() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ĐOẠN ĐÃ THAY ĐỔI: Thêm comment vô hiệu hóa cảnh báo dependency của ESLint
   useEffect(() => {
     fetchMyTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Hàm bổ trợ ép chuỗi thời gian trần về đúng chuẩn UTC để định dạng không bị lệch 7 tiếng

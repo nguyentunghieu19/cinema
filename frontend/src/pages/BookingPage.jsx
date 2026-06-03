@@ -17,9 +17,11 @@ function BookingPage() {
   const seatRows = ["A", "B", "C", "D", "E"];
   const seatCols = 10;
 
+  // ĐOẠN ĐÃ THAY ĐỔI: Thêm comment vô hiệu hóa cảnh báo dependency của ESLint
   useEffect(() => {
     fetchShowtime();
     fetchBookings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showtimeId]);
 
   const fetchShowtime = async () => {
@@ -258,7 +260,7 @@ function BookingPage() {
                   : "bg-neutral-700 text-gray-500 cursor-not-allowed"
               }`}
             >
-              💳 Thanh toán VNPay
+              | 💳 Thanh toán VNPay
             </button>
           </div>
         </div>

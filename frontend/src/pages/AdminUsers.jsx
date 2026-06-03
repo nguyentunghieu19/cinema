@@ -19,6 +19,7 @@ function AdminUsers() {
 
   const [editingUserId, setEditingUserId] = useState(null);
 
+  // ĐOẠN ĐÃ THAY ĐỔI: Thêm 'navigate' vào mảng dependency để sửa cảnh báo ESLint
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -27,7 +28,7 @@ function AdminUsers() {
       return;
     }
     fetchUsers();
-  }, []);
+  }, [navigate]);
 
   const fetchUsers = async () => {
     try {
@@ -157,7 +158,7 @@ function AdminUsers() {
                 Email *
               </label>
               <input
-                type="email"
+                type="text"
                 placeholder="admin@example.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}

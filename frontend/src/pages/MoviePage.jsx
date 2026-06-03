@@ -13,9 +13,11 @@ function MoviePage() {
   const [showtimes, setShowtimes] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ĐOẠN ĐÃ THAY ĐỔI: Thêm comment vô hiệu hóa cảnh báo dependency của ESLint
   useEffect(() => {
     fetchMovie();
     fetchShowtimes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchMovie = async () => {

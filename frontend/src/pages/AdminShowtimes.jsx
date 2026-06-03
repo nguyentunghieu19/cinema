@@ -20,21 +20,32 @@ function AdminShowtimes() {
     available_seats: 100,
   });
 
+  // ĐÃ SỬA: Đưa logic fetch trực tiếp vào trong để mảng [] trống không bị báo lỗi ESLint
   useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const res = await axiosInstance.get("/api/movies/");
+        setMovies(res.data || []);
+      } catch (error) {
+        console.error("Lỗi tải danh sách phim:", error);
+      }
+    };
+
+    const fetchShowtimesData = async () => {
+      try {
+        const data = await getShowtimes();
+        setShowtimes(data || []);
+      } catch (error) {
+        console.error("Lỗi tải lịch chiếu:", error);
+      }
+    };
+
     fetchMovies();
-    fetchShowtimes();
+    fetchShowtimesData();
   }, []);
 
-  const fetchMovies = async () => {
-    try {
-      const res = await axiosInstance.get("/api/movies/");
-      setMovies(res.data || []);
-    } catch (error) {
-      console.error("Lỗi tải danh sách phim:", error);
-    }
-  };
-
-  const fetchShowtimesData = async () => {
+  // Hàm reload danh sách sau khi Thêm/Sửa/Xóa độc lập với useEffect
+  const refreshShowtimes = async () => {
     try {
       const data = await getShowtimes();
       setShowtimes(data || []);
@@ -42,8 +53,6 @@ function AdminShowtimes() {
       console.error("Lỗi tải lịch chiếu:", error);
     }
   };
-
-  const fetchShowtimes = fetchShowtimesData;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +96,7 @@ function AdminShowtimes() {
       }
 
       resetForm();
-      fetchShowtimes();
+      refreshShowtimes();
     } catch (error) {
       console.error("Lỗi lưu lịch chiếu:", error);
       alert(error.response?.data?.detail || "Có lỗi xảy ra!");
@@ -119,7 +128,7 @@ function AdminShowtimes() {
     try {
       await deleteShowtime(id);
       alert("Xóa lịch chiếu thành công!");
-      fetchShowtimes();
+      refreshShowtimes();
     } catch (error) {
       console.error("Lỗi xóa lịch chiếu:", error);
       alert(error.response?.data?.detail || "Không thể xóa lịch chiếu!");
@@ -190,7 +199,7 @@ function AdminShowtimes() {
             {/* Price */}
             <div>
               <label className="block text-sm text-gray-400 mb-2">
-                G vé (VNĐ)
+                Giá vé (VNĐ)
               </label>
               <input
                 type="number"
