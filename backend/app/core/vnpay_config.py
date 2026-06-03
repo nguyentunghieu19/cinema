@@ -1,0 +1,11 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+VNPAY_TMN_CODE = os.getenv("VNPAY_TMN_CODE")
+VNPAY_HASH_SECRET = os.getenv("VNPAY_HASH_SECRET")
+
+VNPAY_PAYMENT_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+
+VNPAY_RETURN_URL = "http://localhost:3000/payment-result"
