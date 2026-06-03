@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const API_URL = "http://127.0.0.1:8000/api";
+const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
 function VerifyEmailPage() {
   const navigate = useNavigate();

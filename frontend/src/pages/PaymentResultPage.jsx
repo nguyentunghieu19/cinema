@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 
-const API_URL = "http://127.0.0.1:8000/api";
+const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
 function PaymentResultPage() {
   const location = useLocation();
