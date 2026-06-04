@@ -7,8 +7,6 @@ from app.core.config import settings
 EMAIL_ADDRESS = settings.EMAIL_ADDRESS
 EMAIL_PASSWORD = settings.EMAIL_PASSWORD
 
-
-
 def send_verification_email(
     receiver_email: str,
     code: str
@@ -30,18 +28,10 @@ Mã có hiệu lực trong lần xác thực này.
 
     msg.attach(MIMEText(body, "plain"))
 
-    server = smtplib.SMTP(
-        "smtp.gmail.com",
-        587
-    )
+    server = smtplib.SMTP_SSL("smtp.gmail.com", 465)  # ← Đổi chỗ này
 
-    server.starttls()
+    # Xóa dòng server.starttls() ← bỏ đi
 
-    server.login(
-        EMAIL_ADDRESS,
-        EMAIL_PASSWORD
-    )
-
+    server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
     server.send_message(msg)
-
     server.quit()
