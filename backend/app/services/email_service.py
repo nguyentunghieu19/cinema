@@ -1,12 +1,23 @@
-import resend
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 import os
 
-resend.api_key = os.getenv("RESEND_API_KEY")
+configuration = sib_api_v3_sdk.Configuration()
+configuration.api_key['api-key'] = os.getenv("BREVO_API_KEY")
 
 def send_verification_email(receiver_email: str, code: str):
-    resend.Emails.send({
-        "from": "Cinema <onboarding@resend.dev>",
-        "to": receiver_email,
-        "subject": "Cinema - Xác thực tài khoản",
-        "text": f"Mã xác thực của bạn là: {code}\n\nMã có hiệu lực trong lần xác thực này."
-    })
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+        sib_api_v3_sdk.ApiClient(configuration)
+    )
+
+    email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": receiver_email}],
+        sender={"name": "Cinema Booking", "email": "nguyenhieu190405@gmail.com"},
+        subject="Cinema - Xác thực tài khoản",
+        text_content=f"Mã xác thực của bạn là: {code}\n\nMã có hiệu lực trong lần xác thực này."
+    )
+
+    try:
+        api_instance.send_transac_email(email)
+    except ApiException as e:
+        print("Email Error:", e)
